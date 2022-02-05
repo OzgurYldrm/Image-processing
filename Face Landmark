@@ -1,0 +1,31 @@
+import cv2
+import mediapipe as mp
+mpDraw = mp.solutions.drawing_utils
+mpFaceMesh = mp.solutions.face_mesh
+faceMesh = mpFaceMesh.FaceMesh(max_num_faces=1,
+                               min_tracking_confidence=0.5,
+                               min_detection_confidence=0.5,
+                               static_image_mode=False)
+contour = mpFaceMesh.FACEMESH_CONTOURS ##yüzdeki çizgiler ağız-kaş
+oval = mpFaceMesh.FACEMESH_FACE_OVAL  ##çizgi sadece dış hatta var
+tes = mpFaceMesh.FACEMESH_TESSELATION ##bütün noktaları bağlar
+iris = mpFaceMesh.FACEMESH_IRISES ##Bİ SIKINTI VAR AMA ANLAMADIM
+eye = mpFaceMesh.FACEMESH_LEFT_EYE ##çizgi sadece gözlerde
+lips = mpFaceMesh.FACEMESH_LIPS ##dudak
+draw_spec = mpDraw.DrawingSpec(thickness=1,circle_radius=1)
+img = cv2.imread("image.jpg")
+#img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+results = faceMesh.process(img)
+h,w,c = img.shape
+if results.multi_face_landmarks:
+    for landmarks in results.multi_face_landmarks:
+        mpDraw.draw_landmarks(image = img,
+                              landmark_list=landmarks,
+                              connections= contour,
+                              landmark_drawing_spec=draw_spec,
+                              )
+        for id,lm in enumerate(landmarks.landmark):
+            x,y = int(lm.x*w),int(lm.y*h)
+            print(id,x,y)
+cv2.imshow("window",img)
+cv2.waitKey(5000)
