@@ -1,0 +1,23 @@
+import numpy as np
+import cv2
+import os
+from PIL import Image
+count = 0
+face_cascade = cv2.CascadeClassifier("C:/Users/LAB5/PycharmProjects/face recognation/cascades/haarcascade_frontalface_alt2.xml")
+Base_dir = os.path.dirname(os.path.abspath(__file__))
+img_file = os.path.join(Base_dir,"Özgür")
+for root,dir,files in os.walk(img_file):
+    for file in files:
+        path = os.path.join(root,file)
+        pil_image = Image.open(path).convert("L")
+        img_array = np.array(pil_image,"uint8")
+        faces = face_cascade.detectMultiScale(img_array, scaleFactor=1.7, minNeighbors=2)
+        save_path = "C:/Users/LAB5/PycharmProjects/face recognation/Detected"
+        if len(faces) == 0:
+            print(file,"empty")
+        elif len(faces) > 1 :
+            print(file,"Double")
+        for (x, y, w, h) in faces:
+            roi = img_array[y:y + h, x:x + w]
+            cv2.imwrite(save_path + '/' + str(count) + '.jpg',roi)
+        count = count + 1
